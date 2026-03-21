@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "about": "About Me",
+    "services": "Services",
+    "booking": "Booking",
+    "contact": "Contact",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Sign Up"
+  },
+  "hero": {
+    "tagline": "Enhancing your natural beauty",
+    "subtitle": "Lashes & Brows specialist",
+    "cta": "Book Now"
+  },
+  "about": {
+    "title": "About Me",
+    "p1": "Hi! I'm Isabella Médici, a lashes and brows specialist passionate about enhancing each client's unique beauty.",
+    "p2": "With years of experience and refined techniques, I offer services that enhance your gaze and provide natural, long-lasting results.",
+    "p3": "Every appointment is personalized, designed especially for you.",
+    "badge1": "Exclusive Techniques",
+    "badge2": "Premium Products",
+    "badge3": "Personalized Care"
+  },
+  "services": {
+    "title": "Services",
+    "subtitle": "Lashes and brows that transform your gaze",
+    "all": "All",
+    "lashes": "Lashes",
+    "brows": "Brows",
+    "duration": "min",
+    "from": "From"
+  },
+  "booking": {
+    "title": "Booking",
+    "subtitle": "Schedule your appointment easily and quickly",
+    "loginRequired": "Login to book",
+    "loginBtn": "Login to Book"
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Get in touch or visit us",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "success": "Message sent successfully!",
+    "hours": "Business Hours",
+    "schedule": "Mon – Sat: 9am – 7pm",
+    "address": "Address",
+    "follow": "Social Media"
+  },
+  "auth": {
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Sign in to your account to book",
+    "registerTitle": "Create your account",
+    "registerSubtitle": "Sign up to book your services",
+    "name": "Full name",
+    "email": "Email",
+    "phone": "WhatsApp (with country code)",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "login": "Login",
+    "register": "Create Account",
+    "forgotPassword": "Forgot my password",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "forgotTitle": "Recover password",
+    "forgotSubtitle": "We'll send a link to your email",
+    "sendLink": "Send link",
+    "backToLogin": "Back to login",
+    "emailSent": "Link sent! Check your email.",
+    "logging": "Logging in...",
+    "registering": "Creating account...",
+    "or": "or"
+  },
+  "chat": {
+    "title": "Booking Assistant",
+    "placeholder": "Type your message...",
+    "welcome": "Hello, {name}! 👋 I'm Isabella Médici Beauty's virtual assistant. Which service would you like to book?",
+    "welcomeGuest": "Hello! 👋 To book an appointment, please log in first.",
+    "send": "Send"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "tagline": "Beauty that transforms gazes."
+  }
+}

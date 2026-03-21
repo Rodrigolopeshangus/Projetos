@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "about": "Sobre Mí",
+    "services": "Servicios",
+    "booking": "Reservas",
+    "contact": "Contacto",
+    "login": "Entrar",
+    "logout": "Salir",
+    "register": "Registrarse"
+  },
+  "hero": {
+    "tagline": "Realzando tu belleza natural",
+    "subtitle": "Especialista en pestañas y cejas",
+    "cta": "Reservar Cita"
+  },
+  "about": {
+    "title": "Sobre Mí",
+    "p1": "¡Hola! Soy Isabella Médici, especialista en pestañas y cejas apasionada por realzar la belleza única de cada clienta.",
+    "p2": "Con años de experiencia y técnicas refinadas, ofrezco servicios que valoran tu mirada y proporcionan resultados naturales y duraderos.",
+    "p3": "Cada atención es personalizada, pensada especialmente para ti.",
+    "badge1": "Técnicas Exclusivas",
+    "badge2": "Productos Premium",
+    "badge3": "Atención Personalizada"
+  },
+  "services": {
+    "title": "Servicios",
+    "subtitle": "Pestañas y cejas que transforman tu mirada",
+    "all": "Todos",
+    "lashes": "Pestañas",
+    "brows": "Cejas",
+    "duration": "min",
+    "from": "Desde"
+  },
+  "booking": {
+    "title": "Reservas",
+    "subtitle": "Agenda tu cita de forma fácil y rápida",
+    "loginRequired": "Inicia sesión para reservar",
+    "loginBtn": "Entrar para Reservar"
+  },
+  "contact": {
+    "title": "Contacto",
+    "subtitle": "Contáctanos o visítanos",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "message": "Mensaje",
+    "send": "Enviar Mensaje",
+    "sending": "Enviando...",
+    "success": "¡Mensaje enviado con éxito!",
+    "hours": "Horario de Atención",
+    "schedule": "Lun – Sáb: 9h a 19h",
+    "address": "Dirección",
+    "follow": "Redes Sociales"
+  },
+  "auth": {
+    "loginTitle": "Bienvenida de vuelta",
+    "loginSubtitle": "Inicia sesión para reservar",
+    "registerTitle": "Crea tu cuenta",
+    "registerSubtitle": "Regístrate para reservar tus servicios",
+    "name": "Nombre completo",
+    "email": "Correo electrónico",
+    "phone": "WhatsApp (con código de área)",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "login": "Entrar",
+    "register": "Crear Cuenta",
+    "forgotPassword": "Olvidé mi contraseña",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "forgotTitle": "Recuperar contraseña",
+    "forgotSubtitle": "Te enviaremos un enlace a tu correo",
+    "sendLink": "Enviar enlace",
+    "backToLogin": "Volver al inicio de sesión",
+    "emailSent": "¡Enlace enviado! Revisa tu correo.",
+    "logging": "Ingresando...",
+    "registering": "Creando cuenta...",
+    "or": "o"
+  },
+  "chat": {
+    "title": "Asistente de Reservas",
+    "placeholder": "Escribe tu mensaje...",
+    "welcome": "¡Hola, {name}! 👋 Soy la asistente virtual de Isabella Médici Beauty. ¿Qué servicio te gustaría reservar?",
+    "welcomeGuest": "¡Hola! 👋 Para reservar, por favor inicia sesión primero.",
+    "send": "Enviar"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados.",
+    "tagline": "Belleza que transforma miradas."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"c:/Users/rodri/Documents/Rodrigo/Projetos/Site Hangus/hangus-store/src/lib\")",
+      "Bash(mkdir -p \"c:/Users/rodri/Documents/Rodrigo/Projetos/Site Hangus/hangus-store/src/context\")",
+      "Bash(mkdir -p \"c:/Users/rodri/Documents/Rodrigo/Projetos/Site Hangus/hangus-store/src/components\")",
+      "Bash(mkdir -p \"c:/Users/rodri/Documents/Rodrigo/Projetos/Site Hangus/hangus-store/src/pages\")",
+      "Bash(mkdir -p \"c:/Users/rodri/Documents/Rodrigo/Projetos/Site Hangus/hangus-store/public\")"
+    ]
+  }
+}

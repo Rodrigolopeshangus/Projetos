@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "about": "Sobre Mim",
+    "services": "Serviços",
+    "booking": "Agendamento",
+    "contact": "Contato",
+    "login": "Entrar",
+    "logout": "Sair",
+    "register": "Criar Conta"
+  },
+  "hero": {
+    "tagline": "Realçando sua beleza natural",
+    "subtitle": "Especialista em cílios e sobrancelhas",
+    "cta": "Agendar Horário"
+  },
+  "about": {
+    "title": "Sobre Mim",
+    "p1": "Olá! Sou Isabella Médici, especialista em cílios e sobrancelhas apaixonada por realçar a beleza única de cada cliente.",
+    "p2": "Com anos de experiência e técnicas refinadas, ofereço serviços que valorizam seu olhar e proporcionam resultados naturais e duradouros.",
+    "p3": "Cada atendimento é personalizado, pensado especialmente para você.",
+    "badge1": "Técnicas Exclusivas",
+    "badge2": "Produtos Premium",
+    "badge3": "Atendimento Personalizado"
+  },
+  "services": {
+    "title": "Serviços",
+    "subtitle": "Cílios e sobrancelhas que transformam seu olhar",
+    "all": "Todos",
+    "lashes": "Cílios",
+    "brows": "Sobrancelhas",
+    "duration": "min",
+    "from": "A partir de"
+  },
+  "booking": {
+    "title": "Agendamento",
+    "subtitle": "Agende seu horário de forma fácil e rápida",
+    "loginRequired": "Faça login para agendar",
+    "loginBtn": "Entrar para Agendar"
+  },
+  "contact": {
+    "title": "Contato",
+    "subtitle": "Entre em contato ou nos visite",
+    "name": "Nome",
+    "email": "E-mail",
+    "message": "Mensagem",
+    "send": "Enviar Mensagem",
+    "sending": "Enviando...",
+    "success": "Mensagem enviada com sucesso!",
+    "hours": "Horário de Atendimento",
+    "schedule": "Seg – Sáb: 9h às 19h",
+    "address": "Endereço",
+    "follow": "Redes Sociais"
+  },
+  "auth": {
+    "loginTitle": "Bem-vinda de volta",
+    "loginSubtitle": "Entre na sua conta para agendar",
+    "registerTitle": "Crie sua conta",
+    "registerSubtitle": "Cadastre-se para agendar seus serviços",
+    "name": "Nome completo",
+    "email": "E-mail",
+    "phone": "WhatsApp (com DDD)",
+    "password": "Senha",
+    "confirmPassword": "Confirmar senha",
+    "login": "Entrar",
+    "register": "Criar Conta",
+    "forgotPassword": "Esqueci minha senha",
+    "noAccount": "Não tem conta?",
+    "hasAccount": "Já tem conta?",
+    "forgotTitle": "Recuperar senha",
+    "forgotSubtitle": "Enviaremos um link para o seu e-mail",
+    "sendLink": "Enviar link",
+    "backToLogin": "Voltar ao login",
+    "emailSent": "Link enviado! Verifique seu e-mail.",
+    "logging": "Entrando...",
+    "registering": "Criando conta...",
+    "or": "ou"
+  },
+  "chat": {
+    "title": "Assistente de Agendamento",
+    "placeholder": "Digite sua mensagem...",
+    "welcome": "Olá, {name}! 👋 Sou a assistente virtual da Isabella Médici Beauty. Qual serviço você gostaria de agendar?",
+    "welcomeGuest": "Olá! 👋 Para agendar, por favor faça login primeiro.",
+    "send": "Enviar"
+  },
+  "footer": {
+    "rights": "Todos os direitos reservados.",
+    "tagline": "Beleza que transforma olhares."
+  }
+}
