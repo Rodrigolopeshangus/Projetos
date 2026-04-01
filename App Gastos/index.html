@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pairpay</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ── CSS VARIABLES (Lovable design) ── */
+:root {
+  --background: hsl(40, 20%, 97%);
+  --foreground: hsl(220, 20%, 15%);
+  --card: hsl(0, 0%, 100%);
+  --primary: hsl(220, 60%, 50%);
+  --primary-fg: hsl(0, 0%, 100%);
+  --secondary: hsl(220, 15%, 93%);
+  --secondary-fg: hsl(220, 20%, 25%);
+  --muted: hsl(220, 15%, 95%);
+  --muted-fg: hsl(220, 10%, 50%);
+  --border: hsl(220, 15%, 90%);
+  --positive: hsl(152, 55%, 42%);
+  --positive-bg: hsla(152, 55%, 42%, 0.1);
+  --positive-border: hsla(152, 55%, 42%, 0.2);
+  --negative: hsl(0, 72%, 51%);
+  --negative-bg: hsla(0, 72%, 51%, 0.1);
+  --negative-border: hsla(0, 72%, 51%, 0.2);
+  --radius: 0.75rem;
+}
+body.dark {
+  --background: hsl(220, 20%, 8%);
+  --foreground: hsl(0, 0%, 95%);
+  --card: hsl(220, 20%, 12%);
+  --primary: hsl(220, 60%, 55%);
+  --secondary: hsl(220, 15%, 18%);
+  --secondary-fg: hsl(0, 0%, 90%);
+  --muted: hsl(220, 15%, 18%);
+  --muted-fg: hsl(220, 10%, 55%);
+  --border: hsl(220, 15%, 20%);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ── HEADER ── */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s;
+}
+body.dark .site-header { background: hsla(220, 20%, 12%, 0.8); }
+.header-inner {
+  max-width: 64rem; margin: 0 auto; padding: 0 1rem;
+  height: 4rem; display: flex; align-items: center; justify-content: space-between;
+}
+.header-logo { display: flex; align-items: center; gap: 0.625rem; }
+.logo-icon {
+  width: 2.25rem; height: 2.25rem; border-radius: 0.5rem;
+  background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+}
+.logo-text { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.025em; }
+.header-actions { display: flex; align-items: center; gap: 0.5rem; }
+.btn-icon {
+  width: 2.25rem; height: 2.25rem; border-radius: 0.5rem;
+  border: 1px solid var(--border); background: transparent;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; color: var(--muted-fg); transition: background 0.2s, color 0.2s;
+}
+.btn-icon:hover { background: var(--secondary); color: var(--foreground); }
+.btn-logout:hover { background: var(--negative-bg); color: var(--negative); border-color: var(--negative-border); }
+
+/* ── MAIN LAYOUT ── */
+.main-content {
+  max-width: 64rem; margin: 0 auto; padding: 2rem 1rem 4rem;
+  display: flex; flex-direction: column; gap: 2rem;
+}
+.page-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+.page-subtitle { font-size: 0.875rem; color: var(--muted-fg); }
+
+/* ── SUMMARY CARDS ── */
+.summary-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 640px)  { .summary-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .summary-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.summary-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem;
+  transition: box-shadow 0.2s;
+}
+.summary-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.summary-card.positive { background: var(--positive-bg); border-color: var(--positive-border); }
+.summary-card.negative { background: var(--negative-bg); border-color: var(--negative-border); }
+.card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+.card-icon { font-size: 1.1rem; color: var(--muted-fg); }
+.card-label { font-size: 0.875rem; font-weight: 500; color: var(--muted-fg); }
+.card-value { font-size: 1.125rem; font-weight: 600; line-height: 1.3; }
+.card-value.positive { color: var(--positive); }
+.card-value.negative { color: var(--negative); }
+
+/* ── FORM ── */
+.form-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem;
+}
+.form-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 1.25rem; }
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 640px)  { .form-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .form-grid { grid-template-columns: repeat(3, 1fr); } }
+.form-field { display: flex; flex-direction: column; }
+.form-field-submit { display: flex; align-items: flex-end; }
+.form-label { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.375rem; }
+.form-input {
+  width: 100%; border: 1px solid var(--border); background: var(--card); color: var(--foreground);
+  border-radius: calc(var(--radius) - 2px); padding: 0.625rem 0.875rem;
+  font-size: 0.875rem; font-family: inherit; outline: none;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.form-input::placeholder { color: var(--muted-fg); }
+.form-input:focus { box-shadow: 0 0 0 3px hsla(220,60%,50%,0.15); border-color: var(--primary); }
+
+/* ── WHO BUTTONS ── */
+.who-group { display: flex; gap: 0.375rem; }
+.who-btn {
+  flex: 1; padding: 0.5rem 0.25rem;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) - 2px);
+  background: transparent; color: var(--muted-fg);
+  font-size: 0.8125rem; font-weight: 500; font-family: inherit;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.who-btn.active-r { background: hsla(24,100%,60%,0.15); border-color: hsla(24,100%,60%,0.4); color: hsl(24,100%,40%); }
+.who-btn.active-i { background: var(--positive-bg); border-color: var(--positive-border); color: var(--positive); }
+.who-btn.active-b { background: hsla(220,60%,50%,0.1); border-color: hsla(220,60%,50%,0.3); color: var(--primary); }
+
+/* ── PRIMARY BUTTON ── */
+.btn-primary {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: var(--primary); color: var(--primary-fg);
+  border: none; border-radius: calc(var(--radius) - 2px);
+  padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ── EXPENSE LIST ── */
+.list-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; }
+.expense-empty {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 2.5rem;
+  text-align: center; color: var(--muted-fg); font-size: 0.875rem;
+}
+.expense-items { display: flex; flex-direction: column; gap: 0.75rem; }
+.expense-item {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  transition: box-shadow 0.2s;
+}
+.expense-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.expense-left { display: flex; align-items: center; gap: 0.75rem; min-width: 0; flex: 1; }
+.cat-icon {
+  width: 2.25rem; height: 2.25rem; border-radius: 0.5rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.expense-info { min-width: 0; }
+.expense-desc { font-size: 0.875rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.expense-meta { font-size: 0.75rem; color: var(--muted-fg); margin-top: 0.125rem; }
+.expense-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+.cat-badge { font-size: 0.75rem; font-weight: 500; padding: 0.125rem 0.5rem; border-radius: 9999px; }
+.expense-amount { font-size: 0.875rem; font-weight: 600; white-space: nowrap; }
+.btn-delete {
+  width: 1.875rem; height: 1.875rem; border-radius: 0.375rem;
+  border: none; background: transparent; color: var(--muted-fg);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 0.875rem; opacity: 0; transition: all 0.2s;
+}
+.expense-item:hover .btn-delete { opacity: 1; }
+.btn-delete:hover { background: var(--negative-bg); color: var(--negative); }
+@media (max-width: 639px) { .btn-delete { opacity: 1; } .cat-badge { display: none; } }
+
+/* ── AUTH / HOUSEHOLD SCREENS ── */
+.overlay-screen {
+  position: fixed; inset: 0; z-index: 100;
+  background: var(--background);
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+}
+.auth-card, .hh-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 0.25rem); padding: 2rem;
+  width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+.auth-card { max-width: 22rem; }
+.hh-card { max-width: 26rem; }
+.auth-logo { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+.auth-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
+.auth-subtitle { font-size: 0.875rem; color: var(--muted-fg); margin-bottom: 1.5rem; }
+.auth-tabs {
+  display: flex; background: var(--muted); border-radius: 0.625rem;
+  padding: 0.25rem; margin-bottom: 1.25rem; gap: 0.25rem;
+}
+.auth-tab {
+  flex: 1; padding: 0.375rem; border: none; border-radius: 0.5rem;
+  background: transparent; font-size: 0.8125rem; font-weight: 500; font-family: inherit;
+  cursor: pointer; color: var(--muted-fg); transition: all 0.2s;
+}
+.auth-tab.active { background: var(--card); color: var(--foreground); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+.auth-field { margin-bottom: 0.75rem; }
+.auth-label { font-size: 0.875rem; font-weight: 500; margin-bottom: 0.375rem; display: block; }
+.auth-msg {
+  font-size: 0.8125rem; padding: 0.625rem 0.875rem; border-radius: 0.5rem;
+  margin-bottom: 0.875rem; display: none;
+}
+.auth-msg.error { background: var(--negative-bg); color: var(--negative); border: 1px solid var(--negative-border); }
+.auth-msg.success { background: var(--positive-bg); color: var(--positive); border: 1px solid var(--positive-border); }
+.auth-switch { font-size: 0.8125rem; color: var(--muted-fg); text-align: center; margin-top: 1rem; }
+.auth-switch a { color: var(--primary); text-decoration: none; }
+.hh-divider { display: flex; align-items: center; gap: 0.75rem; margin: 1.25rem 0; }
+.hh-divider::before, .hh-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.hh-divider-text { font-size: 0.75rem; color: var(--muted-fg); white-space: nowrap; }
+.hh-code-display {
+  font-size: 2rem; font-weight: 800; letter-spacing: 0.12em; color: var(--primary);
+  background: hsla(220,60%,50%,0.08); padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem; border: 1px solid hsla(220,60%,50%,0.2);
+  text-align: center; cursor: pointer; margin-top: 0.75rem; display: none;
+}
+.hh-code-display:hover { background: hsla(220,60%,50%,0.12); }
+.join-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+.btn-secondary {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--secondary); color: var(--secondary-fg);
+  border: 1px solid var(--border); border-radius: calc(var(--radius) - 2px);
+  padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: background 0.2s; white-space: nowrap;
+}
+.btn-secondary:hover { background: var(--border); }
+.btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
+  background: var(--foreground); color: var(--background);
+  padding: 0.75rem 1.25rem; border-radius: 0.625rem;
+  font-size: 0.875rem; font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.3s, transform 0.3s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--positive); color: #fff; }
+.toast.error   { background: var(--negative); color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- ── AUTH SCREEN ── -->
+<div id="auth-screen" class="overlay-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon">💸</div>
+      <span class="logo-text">Pairpay</span>
+    </div>
+    <h1 class="auth-title" id="auth-title">Bem-vindo de volta</h1>
+    <p class="auth-subtitle">Acede à tua conta para continuar.</p>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="auth-tab-login"    onclick="setAuthMode('login')">Entrar</button>
+      <button class="auth-tab"        id="auth-tab-register" onclick="setAuthMode('register')">Criar Conta</button>
+    </div>
+
+    <div id="auth-msg" class="auth-msg"></div>
+
+    <div class="auth-field">
+      <label class="auth-label">Email</label>
+      <input type="email" id="auth-email" class="form-input" placeholder="email@exemplo.com"
+             onkeydown="if(event.key==='Enter')document.getElementById('auth-pass').focus()">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Senha</label>
+      <div style="position:relative">
+        <input type="password" id="auth-pass" class="form-input" placeholder="••••••••"
+               style="padding-right:2.5rem"
+               onkeydown="if(event.key==='Enter')document.getElementById('auth-btn').click()">
+        <button type="button" onclick="togglePassVis()" title="Mostrar/ocultar senha"
+                style="position:absolute;right:0.625rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted-fg);line-height:1;padding:0"
+                id="pass-eye">👁</button>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="auth-btn" onclick="doSignIn()" style="margin-top:0.25rem">Entrar</button>
+    <p class="auth-switch" id="auth-switch">
+      Sem conta? <a href="#" onclick="setAuthMode('register');return false">Criar conta</a>
+    </p>
+  </div>
+</div>
+
+<!-- ── HOUSEHOLD SCREEN ── -->
+<div id="household-screen" class="overlay-screen" style="display:none">
+  <div class="hh-card">
+    <div class="auth-logo">
+      <div class="logo-icon">🏠</div>
+      <span class="logo-text">Configurar Casa</span>
+    </div>
+    <h2 class="auth-title">Bem-vindo!</h2>
+    <p class="auth-subtitle">Cria uma casa e convida o teu parceiro, ou junta-te a uma casa existente.</p>
+
+    <button class="btn-primary" id="create-hh-btn" onclick="createHousehold()">🏠 Criar Nova Casa</button>
+    <div id="hh-code-section" style="display:none;margin-top:0.75rem">
+      <p style="font-size:0.8125rem;color:var(--muted-fg)">Partilha este código com o teu parceiro:</p>
+      <div class="hh-code-display" id="hh-code-display" onclick="copyCode()" title="Clica para copiar"></div>
+    </div>
+
+    <div class="hh-divider"><span class="hh-divider-text">ou entra numa casa existente</span></div>
+
+    <div id="hh-join-msg" style="display:none;font-size:0.8125rem;padding:0.625rem 0.875rem;border-radius:0.5rem;margin-bottom:0.5rem;background:var(--negative-bg);color:var(--negative);border:1px solid var(--negative-border)"></div>
+
+    <div class="join-row">
+      <input type="text" id="hh-join-code" class="form-input" placeholder="Código de 8 letras"
+             maxlength="8" style="text-transform:lowercase"
+             onkeydown="if(event.key==='Enter')joinHousehold()">
+      <button class="btn-secondary" id="join-hh-btn" onclick="joinHousehold()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div id="app-main" style="display:none">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-logo">
+        <div class="logo-icon">💸</div>
+        <span class="logo-text">Pairpay</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" id="theme-btn" onclick="toggleTheme()" title="Alternar tema">🌙</button>
+        <button class="btn-icon" onclick="showInviteCode()" title="Ver código de convite">🔑</button>
+        <button class="btn-icon btn-logout" onclick="signOut()" title="Sair">🚪</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <div>
+      <h1 class="page-title">Visão Geral</h1>
+      <p class="page-subtitle">Acompanhe os gastos do casal em um só lugar.</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <section class="summary-grid">
+      <div class="summary-card">
+        <div class="card-header">
+          <span class="card-icon">💰</span>
+          <span class="card-label">Total Geral</span>
+        </div>
+        <p class="card-value" id="card-total">€0,00</p>
+      </div>
+      <div class="summary-card">
+        <div class="card-header">
+          <span class="card-icon">👤</span>
+          <span class="card-label">Rodrigo</span>
+        </div>
+        <p class="card-value" id="card-rodrigo">€0,00</p>
+      </div>
+      <div class="summary-card">
+        <div class="card-header">
+          <span class="card-icon">👤</span>
+          <span class="card-label">Isabella</span>
+        </div>
+        <p class="card-value" id="card-isabella">€0,00</p>
+      </div>
+      <div class="summary-card" id="card-saldo-wrap">
+        <div class="card-header">
+          <span class="card-icon">⇄</span>
+          <span class="card-label">Saldo</span>
+        </div>
+        <p class="card-value" id="card-saldo">Tudo certo!</p>
+      </div>
+    </section>
+
+    <!-- Expense Form -->
+    <section class="form-card">
+      <h2 class="form-title">Novo Gasto</h2>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">Valor (€)</label>
+          <input type="number" id="f-amount" class="form-input" placeholder="0,00" step="0.01" min="0"
+                 onkeydown="if(event.key==='Enter')document.getElementById('f-desc').focus()">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Descrição</label>
+          <input type="text" id="f-desc" class="form-input" placeholder="Ex: Supermercado"
+                 onkeydown="if(event.key==='Enter')addExpense()">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Categoria</label>
+          <select id="f-cat" class="form-input"></select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Quem pagou</label>
+          <div class="who-group">
+            <button class="who-btn active-r" id="btn-r"    onclick="selectWho('R')">Rodrigo</button>
+            <button class="who-btn"           id="btn-i"    onclick="selectWho('I')">Isabella</button>
+            <button class="who-btn"           id="btn-both" onclick="selectWho('ambos')">50/50</button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Data</label>
+          <input type="date" id="f-date" class="form-input">
+        </div>
+        <div class="form-field-submit">
+          <button class="btn-primary" id="add-btn" onclick="addExpense()">
+            + Adicionar Gasto
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Expense List -->
+    <section>
+      <h2 class="list-title">Gastos Registados</h2>
+      <div id="expense-list-container">
+        <div class="expense-empty">Nenhum gasto registado ainda. Adicione o primeiro acima!</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* ── SUPABASE ── */
+const SUPA_URL = 'https://qkmwrrigiooapfvoquqw.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrbXdycmlnaW9vYXBmdm9xdXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5OTQzMDUsImV4cCI6MjA5MDU3MDMwNX0.DbWz6DPdW-3YhFcKHMRZKruL3GDeq7chCeyUlIFp7qE';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+/* ── CATEGORIES ── */
+const CATS = [
+  { name:'Alimentação', icon:'🛒', bg:'#fff7ed', color:'#ea580c' },
+  { name:'Casa',        icon:'🏠', bg:'#eff6ff', color:'#2563eb' },
+  { name:'Restaurante', icon:'🍽️', bg:'#fffbeb', color:'#d97706' },
+  { name:'Transporte',  icon:'🚗', bg:'#f5f3ff', color:'#7c3aed' },
+  { name:'Saúde',       icon:'💊', bg:'#ecfeff', color:'#0891b2' },
+  { name:'Lazer',       icon:'🎮', bg:'#f0fdf4', color:'#16a34a' },
+  { name:'Estética',    icon:'💅', bg:'#fdf2f8', color:'#db2777' },
+  { name:'Roupa',       icon:'👗', bg:'#eff6ff', color:'#0369a1' },
+  { name:'Tecnologia',  icon:'💻', bg:'#eef2ff', color:'#4f46e5' },
+  { name:'Viagens',     icon:'✈️', bg:'#f0fdfa', color:'#0d9488' },
+  { name:'Outros',      icon:'📦', bg:'#f9fafb', color:'#6b7280' },
+];
+const CAT_MAP = Object.fromEntries(CATS.map(c => [c.name, c]));
+
+const THEME_KEY = 'gastos-casal-theme';
+let currentUser = null;
+let householdId = null;
+let expenses    = [];
+let whoSel      = 'R';
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', async () => {
+  const catSel = document.getElementById('f-cat');
+  CATS.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.name;
+    o.textContent = c.icon + ' ' + c.name;
+    catSel.appendChild(o);
+  });
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  applyTheme(localStorage.getItem(THEME_KEY) || 'light');
+  await initAuth();
+});
+
+/* ── AUTH ── */
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) { currentUser = session.user; await loadHousehold(); }
+  else showAuthScreen();
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session?.user) { currentUser = session.user; await loadHousehold(); }
+    else if (event === 'SIGNED_OUT') { currentUser = null; householdId = null; expenses = []; showAuthScreen(); }
+  });
+}
+
+function showAuthScreen()    { set('auth-screen','flex'); set('household-screen','none'); set('app-main','none'); }
+function showHouseholdScreen(){ set('auth-screen','none'); set('household-screen','flex'); set('app-main','none'); }
+function showApp()           { set('auth-screen','none'); set('household-screen','none'); set('app-main','block'); }
+function set(id, v) { document.getElementById(id).style.display = v; }
+
+let authMode = 'login';
+function setAuthMode(mode) {
+  authMode = mode;
+  document.getElementById('auth-title').textContent = mode === 'login' ? 'Bem-vindo de volta' : 'Criar Conta';
+  document.getElementById('auth-btn').textContent   = mode === 'login' ? 'Entrar' : 'Criar Conta';
+  document.getElementById('auth-btn').onclick       = mode === 'login' ? doSignIn : doSignUp;
+  document.getElementById('auth-switch').innerHTML  = mode === 'login'
+    ? 'Sem conta? <a href="#" onclick="setAuthMode(\'register\');return false">Criar conta</a>'
+    : 'Já tens conta? <a href="#" onclick="setAuthMode(\'login\');return false">Entrar</a>';
+  document.getElementById('auth-tab-login').className    = 'auth-tab' + (mode === 'login'    ? ' active' : '');
+  document.getElementById('auth-tab-register').className = 'auth-tab' + (mode === 'register' ? ' active' : '');
+  document.getElementById('auth-msg').style.display = 'none';
+}
+
+async function doSignIn() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-pass').value;
+  if (!email || !pass) { showAuthMsg('Preenche email e senha', false); return; }
+  const btn = document.getElementById('auth-btn');
+  btn.disabled = true; btn.textContent = 'A entrar...';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Entrar';
+  if (error) showAuthMsg(error.message === 'Invalid login credentials' ? 'Email ou senha incorretos' : error.message, false);
+}
+
+async function doSignUp() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-pass').value;
+  if (!email || !pass) { showAuthMsg('Preenche email e senha', false); return; }
+  if (pass.length < 6) { showAuthMsg('A senha deve ter pelo menos 6 caracteres', false); return; }
+  const btn = document.getElementById('auth-btn');
+  btn.disabled = true; btn.textContent = 'A criar...';
+  const { error } = await sb.auth.signUp({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Criar Conta';
+  if (error) showAuthMsg(error.message, false);
+  else showAuthMsg('Conta criada! Verifica o teu email.', true);
+}
+
+function showAuthMsg(msg, success) {
+  const el = document.getElementById('auth-msg');
+  el.textContent = msg;
+  el.className = 'auth-msg ' + (success ? 'success' : 'error');
+  el.style.display = 'block';
+}
+
+async function signOut() { await sb.auth.signOut(); }
+
+/* ── HOUSEHOLD ── */
+async function loadHousehold() {
+  const { data } = await sb.from('profiles').select('household_id').eq('id', currentUser.id).single();
+  if (data?.household_id) { householdId = data.household_id; showApp(); load(); }
+  else showHouseholdScreen();
+}
+
+async function createHousehold() {
+  const btn = document.getElementById('create-hh-btn');
+  btn.disabled = true; btn.textContent = 'A criar...';
+  const { data: hh, error } = await sb.from('households').insert({}).select().single();
+  if (error) { btn.disabled = false; btn.textContent = '🏠 Criar Nova Casa'; showToast('Erro: ' + error.message, 'error'); return; }
+  const { error: e2 } = await sb.from('profiles').insert({ id: currentUser.id, household_id: hh.id });
+  if (e2) { btn.disabled = false; btn.textContent = '🏠 Criar Nova Casa'; showToast('Erro: ' + e2.message, 'error'); return; }
+  householdId = hh.id;
+  document.getElementById('hh-code-display').textContent = hh.invite_code;
+  document.getElementById('hh-code-display').style.display = 'block';
+  document.getElementById('hh-code-section').style.display = 'block';
+  btn.textContent = '✓ Casa Criada!';
+}
+
+async function joinHousehold() {
+  const code = document.getElementById('hh-join-code').value.trim().toLowerCase();
+  const msgEl = document.getElementById('hh-join-msg');
+  msgEl.style.display = 'none';
+  if (!code) { showJoinMsg('Insere o código de convite.'); return; }
+  const btn = document.getElementById('join-hh-btn');
+  btn.disabled = true; btn.textContent = 'A entrar...';
+  const { data: hh } = await sb.from('households').select('id').eq('invite_code', code).single();
+  if (!hh) { btn.disabled = false; btn.textContent = 'Entrar'; showJoinMsg('Código inválido. Verifica e tenta novamente.'); return; }
+  const { error } = await sb.from('profiles').upsert({ id: currentUser.id, household_id: hh.id }, { onConflict: 'id' });
+  if (error) { btn.disabled = false; btn.textContent = 'Entrar'; showJoinMsg('Erro: ' + error.message); return; }
+  householdId = hh.id;
+  showApp(); load();
+}
+
+function showJoinMsg(msg) {
+  const el = document.getElementById('hh-join-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function copyCode() {
+  const code = document.getElementById('hh-code-display').textContent;
+  navigator.clipboard.writeText(code).then(() => showToast('Código copiado!', 'success'));
+}
+
+/* ── THEME ── */
+function applyTheme(t) {
+  document.body.classList.toggle('dark', t === 'dark');
+  document.getElementById('theme-btn').textContent = t === 'dark' ? '☀️' : '🌙';
+}
+function toggleTheme() {
+  const next = document.body.classList.contains('dark') ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem(THEME_KEY, next);
+}
+
+/* ── WHO SELECT ── */
+function selectWho(w) {
+  whoSel = w;
+  document.getElementById('btn-r').className    = 'who-btn' + (w === 'R'     ? ' active-r' : '');
+  document.getElementById('btn-i').className    = 'who-btn' + (w === 'I'     ? ' active-i' : '');
+  document.getElementById('btn-both').className = 'who-btn' + (w === 'ambos' ? ' active-b' : '');
+}
+
+/* ── DATA LOAD ── */
+async function load() {
+  try {
+    const { data } = await sb.from('expenses').select('*').eq('household_id', householdId).order('date', { ascending: false });
+    expenses = (data || []).map(e => ({ ...e, desc: e.description }));
+  } catch (e) { expenses = []; }
+  renderCards();
+  renderList();
+}
+
+/* ── ADD EXPENSE ── */
+async function addExpense() {
+  const desc   = document.getElementById('f-desc').value.trim();
+  const amount = parseFloat(document.getElementById('f-amount').value);
+  const cat    = document.getElementById('f-cat').value;
+  const date   = document.getElementById('f-date').value;
+  if (!desc)                     { showToast('Preenche a descrição', 'error'); return; }
+  if (isNaN(amount) || amount <= 0) { showToast('Insere um valor válido', 'error'); return; }
+
+  const btn = document.getElementById('add-btn');
+  btn.disabled = true; btn.textContent = 'A guardar...';
+  const ts = Date.now().toString();
+  let rows;
+  if (whoSel === 'ambos') {
+    const h = parseFloat((amount / 2).toFixed(2));
+    rows = [
+      { id: ts + 'r', description: desc, amount: h, cat, date, who: 'R', household_id: householdId },
+      { id: ts + 'i', description: desc, amount: h, cat, date, who: 'I', household_id: householdId },
+    ];
+  } else {
+    rows = [{ id: ts, description: desc, amount, cat, date, who: whoSel, household_id: householdId }];
+  }
+  const { error } = await sb.from('expenses').insert(rows);
+  if (error) { showToast('Erro: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '+ Adicionar Gasto'; return; }
+  rows.forEach(r => expenses.unshift({ ...r, desc: r.description }));
+  document.getElementById('f-desc').value   = '';
+  document.getElementById('f-amount').value = '';
+  document.getElementById('f-date').value   = new Date().toISOString().split('T')[0];
+  renderCards(); renderList();
+  showToast('Gasto adicionado!', 'success');
+  setTimeout(() => { btn.disabled = false; btn.textContent = '+ Adicionar Gasto'; }, 400);
+}
+
+/* ── DELETE EXPENSE ── */
+async function deleteExpense(id) {
+  const { error } = await sb.from('expenses').delete().eq('id', String(id));
+  if (error) { showToast('Erro ao apagar', 'error'); return; }
+  expenses = expenses.filter(e => String(e.id) !== String(id));
+  renderCards(); renderList();
+  showToast('Gasto removido');
+}
+
+/* ── RENDER CARDS ── */
+function renderCards() {
+  const tR    = expenses.filter(e => e.who === 'R').reduce((s, e) => s + e.amount, 0);
+  const tI    = expenses.filter(e => e.who === 'I').reduce((s, e) => s + e.amount, 0);
+  const total = tR + tI;
+  const saldo = tR - total / 2;
+
+  document.getElementById('card-total').textContent    = fmt(total);
+  document.getElementById('card-rodrigo').textContent  = fmt(tR);
+  document.getElementById('card-isabella').textContent = fmt(tI);
+
+  const saldoEl = document.getElementById('card-saldo');
+  const wrapEl  = document.getElementById('card-saldo-wrap');
+  wrapEl.className  = 'summary-card';
+  saldoEl.className = 'card-value';
+
+  if (Math.abs(saldo) < 0.01) {
+    saldoEl.textContent = 'Tudo certo! 🎉';
+  } else if (saldo > 0) {
+    saldoEl.textContent = `Isabella deve ${fmt(saldo)} a Rodrigo`;
+    wrapEl.className  += ' negative';
+    saldoEl.className += ' negative';
+  } else {
+    saldoEl.textContent = `Rodrigo deve ${fmt(Math.abs(saldo))} a Isabella`;
+    wrapEl.className  += ' positive';
+    saldoEl.className += ' positive';
+  }
+}
+
+/* ── RENDER LIST ── */
+function renderList() {
+  const container = document.getElementById('expense-list-container');
+  if (expenses.length === 0) {
+    container.innerHTML = '<div class="expense-empty">Nenhum gasto registado ainda. Adicione o primeiro acima!</div>';
+    return;
+  }
+  container.innerHTML = '<div class="expense-items">' + expenses.map(e => {
+    const cat     = CAT_MAP[e.cat] || CAT_MAP['Outros'];
+    const name    = e.who === 'R' ? 'Rodrigo' : 'Isabella';
+    const dateStr = e.date ? new Date(e.date + 'T12:00').toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' }) : '';
+    return `
+      <div class="expense-item">
+        <div class="expense-left">
+          <div class="cat-icon" style="background:${cat.bg};color:${cat.color}">${cat.icon}</div>
+          <div class="expense-info">
+            <p class="expense-desc">${escHtml(e.desc)}</p>
+            <p class="expense-meta">${name} · ${dateStr}</p>
+          </div>
+        </div>
+        <div class="expense-right">
+          <span class="cat-badge" style="background:${cat.bg};color:${cat.color}">${e.cat}</span>
+          <span class="expense-amount">${fmt(e.amount)}</span>
+          <button class="btn-delete" onclick="deleteExpense('${escHtml(String(e.id))}')" title="Remover">🗑</button>
+        </div>
+      </div>`;
+  }).join('') + '</div>';
+}
+
+/* ── SHOW/HIDE PASSWORD ── */
+function togglePassVis() {
+  const inp = document.getElementById('auth-pass');
+  const eye = document.getElementById('pass-eye');
+  if (inp.type === 'password') { inp.type = 'text';     eye.textContent = '🙈'; }
+  else                         { inp.type = 'password'; eye.textContent = '👁';  }
+}
+
+/* ── SHOW INVITE CODE ── */
+async function showInviteCode() {
+  if (!householdId) { showToast('Sem casa associada', 'error'); return; }
+  const { data } = await sb.from('households').select('invite_code').eq('id', householdId).single();
+  if (data?.invite_code) {
+    const code = data.invite_code;
+    navigator.clipboard.writeText(code).catch(() => {});
+    showToast('Código: ' + code.toUpperCase() + ' (copiado!)', 'success');
+  }
+}
+
+/* ── UTILS ── */
+function fmt(n)    { return '€' + n.toFixed(2).replace('.', ','); }
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+</script>
+</body>
+</html>
